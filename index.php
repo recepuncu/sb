@@ -16,8 +16,8 @@ if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-######### DEĞİŞKENLER #########
-define('BASE_URL', sprintf('//%s/%s', $_SERVER['HTTP_HOST'], basename(__DIR__)));
+//define('BASE_URL', sprintf('//%s/%s', $_SERVER['HTTP_HOST'], basename(__DIR__)));
+define('BASE_URL', '//sirabulucu.herokuapp.com');
 $client = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
 
 Flight::route('/test', function() {
