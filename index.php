@@ -16,22 +16,23 @@ if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-//define('BASE_URL', sprintf('//%s/%s', $_SERVER['HTTP_HOST'], basename(__DIR__)));
-define('BASE_URL', '//sirabulucu.herokuapp.com');
+define('BASE_URL', sprintf('//%s/%s', $_SERVER['HTTP_HOST'], basename(__DIR__)));
 $client = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
 
-Flight::route('/test', function() {
+Flight::route('/', function() {
     Flight::render('ui/ana-sayfa', array('adi_soyadi' => 'Recep UNCU'), 'body_content');
     Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
 });
 
-Flight::route('/sorgu-sonucu', function() {
+Flight::route('POST /kp', function() {
     global $client;
+
+    $request = Flight::request();
 
     $res = $client->request('GET', 'https://www.googleapis.com/customsearch/v1', [
         'query' => [
-            'q' => 'samsung',
-            'cr' => 'countryTR',
+            'q' => $request->data["q"],
+            'cr' => $request->data["cr"],
             'cx' => '001622181081046809365:naip9m8r5si',
             'lr' => 'lang_tr',
             'key' => 'AIzaSyCcnDGqQdWTjTmSJavsLgWjDB65pCIqsJU',
