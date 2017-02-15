@@ -16,32 +16,32 @@ if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-define('BASE_URL', sprintf('//%s/%s', $_SERVER['HTTP_HOST'], basename(__DIR__)));
-$client = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
+include 'config.php';
+
+$database = new \Medoo\medoo(array(
+	'database_type' => 'mysql',
+	'server' => SERVER,
+	'database_name' => DATABASE_NAME,
+	'username' => USERNAME,
+	'password' => PASSWORD,
+	'charset' => 'utf8'));
+	
+include 'functions_ui.php';	
+
+$client = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
 
 Flight::route('/', function() {
-    Flight::render('ui/ana-sayfa', array('adi_soyadi' => 'Recep UNCU'), 'body_content');
+    Flight::render('ui/ana-sayfa', array(), 'body_content');
     Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
 });
 
-Flight::route('POST /kp', function() {
-    global $client;
-
-    $request = Flight::request();
-
-    $res = $client->request('GET', 'https://www.googleapis.com/customsearch/v1', [
-        'query' => [
-            'q' => $request->data["q"],
-            'cr' => $request->data["cr"],
-            'cx' => '001622181081046809365:naip9m8r5si',
-            'lr' => 'lang_tr',
-            'key' => 'AIzaSyCcnDGqQdWTjTmSJavsLgWjDB65pCIqsJU',
-        ]
-    ]);
-
-    //echo $res->getStatusCode();
-    //echo $res->getHeaderLine('content-type');
-    echo $res->getBody();
+Flight::route('/kayit-ol', function() {
+    Flight::render('ui/kayit-ol', array(), 'body_content');
+    Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
 });
+
+Flight::route('POST /kayit-ol/post', 'kayit_ol_post');
+
+Flight::route('POST /kp', 'post_kp');
 
 Flight::start();
