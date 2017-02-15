@@ -30,18 +30,42 @@ include 'functions_ui.php';
 
 $client = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
 
+Flight::map('authorization', function () {
+    if (!array_key_exists('kisi', $_SESSION)) {
+        Flight::halt(401, "Yetkili olmayan giremez!");
+    }else{
+		global $database;
+		$kisi_id = $_SESSION['kisi']['id'];
+		$kisi = $database->get('kisi', array('id', 'mail', 'adi_soyadi'), array('id' => $kisi_id));	
+		if($kisi==null){
+			Flight::halt(401, "Yetkili olmayan giremez!");
+		}
+	}
+});
+
 Flight::route('/', function() {
     Flight::render('ui/ana-sayfa', array(), 'body_content');
     Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
 });
 
+Flight::route('/cikis-yap', function() {
+	unset($_SESSION['kisi']);
+	session_destroy();
+	Flight::redirect('/');
+});
+
+Flight::route('POST /kp', 'post_kp');
+
 Flight::route('/kayit-ol', function() {
     Flight::render('ui/kayit-ol', array(), 'body_content');
     Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
 });
-
 Flight::route('POST /kayit-ol/post', 'kayit_ol_post');
 
-Flight::route('POST /kp', 'post_kp');
+Flight::route('/panel', function() {
+	Flight::authorization();
+    Flight::render('ui/panel', array(), 'body_content');
+    Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
+});
 
 Flight::start();

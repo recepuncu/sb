@@ -23,7 +23,7 @@
 				<label for="sifre2">Şifre Tekrar</label>
 				<input type="password" class="form-control" ng-model="kisi.sifre2" id="sifre2" name="sifre2" placeholder="Şifre" required />
 				<span ng-show="form_kayit_ol.sifre2.$touched && form_kayit_ol.sifre2.$invalid" class="required-mesaj">Şifre tekrar gereklidir.</span>
-				<span ng-show="form_kayit_ol.sifre2.$touched && form_kayit_ol.sifre2.$valid && sifre!=sifre2" class="required-mesaj">Şifre uyuşmuyor.</span>
+				<span ng-show="form_kayit_ol.sifre2.$touched && form_kayit_ol.sifre2.$valid && kisi.sifre!=kisi.sifre2" class="required-mesaj">Şifre uyuşmuyor.</span>
 			  </div>
 			  <div class="checkbox">
 				<label>
@@ -31,7 +31,7 @@
 				</label>
 				<span ng-show="form_kayit_ol.sozlesme.$touched && form_kayit_ol.sozlesme.$invalid" class="required-mesaj">Kullanım koşullarını kabul etmediniz!</span>
 			  </div>
-			  <button ng-click="kayitOlClick()" ng-disabled="form_kayit_ol.$invalid" type="button" class="btn btn-primary">
+			  <button ng-click="kayitOlClick()" ng-disabled="form_kayit_ol.$invalid || (form_kayit_ol.sifre2.$valid && kisi.sifre!=kisi.sifre2)" type="button" class="btn btn-primary">
                     <i class="fa" ng-class="{'fa-check-circle': !islemYapiliyor['kayitOlClick'], 'fa-cog fa-spin': islemYapiliyor['kayitOlClick']}" aria-hidden="true"></i> 
                     Kayıt Ol
                 </button>

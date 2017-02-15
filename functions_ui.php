@@ -42,23 +42,31 @@ function kayit_ol_post(){
 	global $database;
 	$request = Flight::request();
 	
-    if ($request->data["mail"] == "" || $request->data["adi_soyadi"] == "") {
+    if ($request->data['mail'] == '' || $request->data['adi_soyadi'] == '') {
         Flight::halt(200, 'Bilgiler eksik...');
-    }	
+    }
 	
-	$database->insert("kisi", array(
-		'mail'=>$request->data["mail"],
-		'adi_soyadi'=>$request->data["adi_soyadi"],
-		'sifre'=>$request->data["sifre"],
-		'sozlesme'=>$request->data["sozlesme"],
+	if($request->data['sifre'] <> $request->data['sifre2']){
+		Flight::halt(200, 'Şifre uyuşmuyor...');
+	}
+	
+	$database->insert('kisi', array(
+		'mail'=>$request->data['mail'],
+		'adi_soyadi'=>$request->data['adi_soyadi'],
+		'sifre'=>md5(md5($request->data['sifre'])),
+		'sozlesme'=>$request->data['sozlesme'],
 		'olusturulma_zamani'=>date('Y-m-d H:i:s')
 	));
 	$kisi_id = $database->id();
 	
 	$kisi = null;
 	if($kisi_id > 0){
-		$kisi = $database->get("kisi", array("mail", "adi_soyadi"), array("id" => $kisi_id));	
-		$_SESSION['kisi'] = $kisi;
+		$kisi = $database->get('kisi', array('id', 'mail', 'adi_soyadi'), array('id' => $kisi_id));	
+		$_SESSION['kisi'] = array(
+			'id' => $kisi['id'],
+			'mail' => $kisi['mail'],
+			'adi_soyadi' => $kisi['adi_soyadi']
+		);
 	}
 	
 	Flight::json($kisi);
@@ -67,20 +75,20 @@ function kayit_ol_post(){
 function post_kp() {
     $request = Flight::request();
 
-    if ($request->data["q"] == "" || $request->data["site"] == "") {
+    if ($request->data['q'] == '' || $request->data['site'] == '') {
         Flight::halt(200, 'Bilgiler eksik...');
     }
 
-    $customsearchResponse = customSearch($request->data["q"], $request->data["cr"]);
-    $digerBilgiler = digerBilgiler($customsearchResponse, $request->data["site"]);
+    $customsearchResponse = customSearch($request->data['q'], $request->data['cr']);
+    $digerBilgiler = digerBilgiler($customsearchResponse, $request->data['site']);
     $result = array(
         'customsearchResponse' => $customsearchResponse,
         'tarih' => date('d/m/Y'),
         'sunucu' => 'google.com.tr',
         'ulke' => 'Turkey',
         'dil' => 'Turkish',
-        'kelime' => $request->data["q"],
-        'site' => $request->data["site"],
+        'kelime' => $request->data['q'],
+        'site' => $request->data['site'],
         'sira' => $digerBilgiler['sira'],
         'diger_siralar' => $digerBilgiler['diger_siralar'],
         'diger_siteler' => $digerBilgiler['diger_siteler']

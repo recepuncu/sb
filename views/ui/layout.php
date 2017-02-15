@@ -44,8 +44,12 @@
                     <li class="active"><a href="<?php echo BASE_URL; ?>"><span class="glyphicon glyphicon-search"></span> Sıra Bulucu</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="<?php echo BASE_URL; ?>/kayit-ol"><span class="glyphicon glyphicon-user"></span> Kayıt Ol</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/giris-yap"><span class="glyphicon glyphicon-lock"></span> Giriş Yap</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>/kayit-ol"><span class="glyphicon glyphicon-user"></span> Kayıt Ol</a></li>                    					
+					<?php if(!empty($_SESSION['kisi'])){ ?>
+						<li><a href="<?php echo BASE_URL; ?>/cikis-yap"><span class="glyphicon glyphicon-log-out"></span> Çıkış Yap</a></li>
+					<?php }else{ ?>
+						<li><a href="<?php echo BASE_URL; ?>/giris-yap"><span class="glyphicon glyphicon-lock"></span> Giriş Yap</a></li>
+					<?php } ?>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
