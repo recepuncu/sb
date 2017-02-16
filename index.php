@@ -56,6 +56,12 @@ Flight::route('/cikis-yap', function() {
 
 Flight::route('POST /kp', 'post_kp');
 
+Flight::route('/giris-yap', function() {
+    Flight::render('ui/giris-yap', array(), 'body_content');
+    Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));
+});
+Flight::route('POST /giris-yap/post', 'giris_yap_post');
+
 Flight::route('/kayit-ol', function() {
     Flight::render('ui/kayit-ol', array(), 'body_content');
     Flight::render('ui/layout', array('title' => 'SIRA BULUCU'));

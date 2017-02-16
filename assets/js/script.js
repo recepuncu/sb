@@ -273,10 +273,7 @@ angular.module('app.controllers', [])
                     });
                 }
 
-                $scope.kayitOlClick = function () {
-                    var notify = $.notify('<strong>Kayıt ediliyor...</strong> Lütfen sayfayı kapatmayın...', {
-                        allow_dismiss: false
-                    });
+                $scope.kayitOlClick = function () {                    
                     $scope.islemYapiliyor['kayitOlClick'] = true;
                     $http({
                         method: 'POST',
@@ -285,10 +282,36 @@ angular.module('app.controllers', [])
                     }).then(function successCallback(response) {
                         $scope.islemYapiliyor['kayitOlClick'] = false;
                         if (response != false) {
-                            notify.update({'type': 'success', 'message': '<strong>Kayıt başarılı</strong> Bilgileriniz kayıt edildi!'});
+                            $.notify({'type': 'success', 'message': '<strong>Kayıt başarılı</strong> Bilgileriniz kayıt edildi!'});
                         }
                     }, function errorCallback(response) {
                         $scope.islemYapiliyor['kayitOlClick'] = false;
+                    });
+                }
+				
+				$scope.girisYapClick = function () {                    
+                    $scope.islemYapiliyor['girisYapClick'] = true;
+                    $http({
+                        method: 'POST',
+                        url: $scope.BASE_URL + '/giris-yap/post',
+                        data: $scope.kisi
+                    }).then(function successCallback(response) {
+                        $scope.islemYapiliyor['girisYapClick'] = false;						
+                        if (response != false) {
+							if(response.data.sonuc==true){
+								$.notify({
+									'type': 'success', 
+									'message': '<strong>Giriş başarılı</strong> Panel açılıyor...'									
+								});
+								setTimeout(function(){
+									window.location.href = 'panel';
+								}, 1500);
+							}else{
+								$.notify({'type': 'error', 'message': '<strong>'+response.data.mesaj+'</strong>'});
+							}
+                        }
+                    }, function errorCallback(response) {
+                        $scope.islemYapiliyor['girisYapClick'] = false;
                     });
                 }
 

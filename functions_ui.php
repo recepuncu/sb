@@ -8,6 +8,8 @@ function customSearch($q, $cr, $lr = 'lang_tr', $start = 1) {
         'start' => $start,
         'cx' => CX,
         'key' => KEY,
+		'googlehost' => 'google.com.tr',
+		'userIp' => '78.186.141.52'
     );
     if ($cr <> -1) {
         $query['cr'] = $cr;
@@ -36,6 +38,27 @@ function digerBilgiler($customsearchResponse, $site) {
         'diger_siralar' => $diger_siralar,
         'diger_siteler' => $diger_siteler
     );
+}
+
+function giris_yap_post(){
+	global $database;
+	$request = Flight::request();
+	
+    if ($request->data['mail'] == '' || $request->data['sifre'] == '') {
+        Flight::halt(200, 'Bilgiler eksik...');
+    }
+		
+	$kisi = $database->get('kisi', array('id', 'mail', 'adi_soyadi'), array('AND'=>array('mail' =>$request->data['mail'],'sifre' =>md5(md5($request->data['sifre']))) ));	
+	if($kisi!=null){
+		$_SESSION['kisi'] = array(
+			'id' => $kisi['id'],
+			'mail' => $kisi['mail'],
+			'adi_soyadi' => $kisi['adi_soyadi']
+		);
+		Flight::json(array('sonuc'=>true, 'kisi'=>$kisi));
+	}else{
+		Flight::json(array('sonuc'=>false, 'mesaj'=>'Giriş Başarısız!'));
+	}
 }
 
 function kayit_ol_post(){
