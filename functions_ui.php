@@ -61,6 +61,25 @@ function giris_yap_post(){
 	}
 }
 
+function get_arama_motoru_sunucu_by_url($googlehost){
+	if(empty($googlehost)){
+		return false;
+	}else{
+		global $database;
+		$sonuc = $database->query("SELECT arama_motoru_sunucu.id, 
+									CONCAT(arama_motoru.base_url,arama_motoru_sunucu.url_suffix) googlehost 
+									FROM arama_motoru_sunucu
+									JOIN arama_motoru ON arama_motoru.id=arama_motoru_id
+									WHERE CONCAT(arama_motoru.base_url,arama_motoru_sunucu.url_suffix) = '".$googlehost."' LIMIT 1");
+		if($sonuc){
+			$data = $sonuc->fetch(PDO::FETCH_ASSOC);
+			return $data;
+		}else{
+			return false;
+		}
+	}
+}
+
 function kayit_ol_post(){
 	global $database;
 	$request = Flight::request();
@@ -90,6 +109,45 @@ function kayit_ol_post(){
 			'mail' => $kisi['mail'],
 			'adi_soyadi' => $kisi['adi_soyadi']
 		);
+		
+		#PROJE KAYIT EDİLİYOR BEGIN;
+		if($_SESSION['son_islem'] != null){
+			$son_islem = $_SESSION['son_islem'];
+			$proje_id = $database->insert('proje', array(
+				'kisi_id'=> $kisi_id,
+				'baslik'=> $son_islem['kelime'],
+				'alan_adi'=> $son_islem['site'],
+				'olusturulma_zamani'=> date('Y-m-d H:i:s')
+			));
+			if($proje_id>0){				
+				$arama_motoru_sunucu = get_arama_motoru_sunucu_by_url($son_islem['sunucu']);				
+				$database->insert('proje_arama_motoru_sunucu', array(
+					'proje_id'=> $proje_id,
+					'arama_motoru_sunucu_id'=> $arama_motoru_sunucu['id'],
+					'olusturulma_zamani'=> date('Y-m-d H:i:s')
+				));
+				$proje_kelime_id = $database->insert('proje_kelime', array(
+					'proje_id'=> $proje_id,
+					'tanim'=> $son_islem['kelime'],
+					'olusturulma_zamani'=> date('Y-m-d H:i:s')
+				));
+				$database->insert('anahtar_kelime_sira', array(
+					'proje_kelime_id'=> $proje_kelime_id,
+					'arama_motoru_id'=> $arama_motoru_sunucu['id'],
+					'sira'=> $son_islem['sira'],
+					'diger_siralar'=> implode(',', $son_islem['diger_siralar']),
+					'tarih'=> date('Y-m-d H:i:s')
+				));
+				foreach($son_islem['diger_siteler'] as $diger_site){
+					$database->insert('proje_rakip', array(
+						'proje_id'=> $proje_id,
+						'tanim'=> $diger_site,
+						'olusturulma_zamani'=> date('Y-m-d H:i:s')
+					));	
+				}
+			}
+		}
+		#PROJE KAYIT EDİLİYOR END;		
 	}
 	
 	Flight::json($kisi);
